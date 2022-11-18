@@ -1,13 +1,20 @@
+#
+#
 # This script controls the functions needed to preocess solemon data collected onboard.
+# It is hosted at https://github.com/CNRFisheries/SoleMon_project
+# If you consider to do any change, please contact the github page administrator.
+#
 # it runs on R 4.0.5 32 bit version due to compatibility issue with RODBC package needed to read from .accdb
-# Last update: 14.11.2022
-# function code is stored in the 'functions_access_v2_0.R' file. Functions are accompained by explanatory text.
-
+# Last update: 18.11.2022
+#
+# functions are written in the 'functions_access_v2_0.R' file and are accompained by explanatory text.
+# for usage information refer to the handbook 'handbook.HTML'.
+#
+#
 rm(list = ls())
-
 main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
                ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/github/SoleMon_project/OnBoard", 
-                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA))) # paste working directory where xxx is located
+                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA))) 
 setwd(main_wd)
 source('R/functions_access_v2_0.R')
 
@@ -21,7 +28,7 @@ db='test' # to be specified only for single hauls
 updateID='N'
 area_sepia='D'
 year=2021
-area='TEST'
+area='TEST' 
 
 # single haul application ####
 # function1 extract data from access db and format them

@@ -11,6 +11,9 @@ library(RODBC)
 library(gridExtra)
 library(grid)
 '%ni%'=Negate('%in%')
+main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
+               ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/github/SoleMon_project/OnBoard", 
+                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA)))
 
 # set parameters ####
 DRIVERINFO <- "Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
@@ -438,8 +441,29 @@ function4=function(trustdat, year, area, haul){
   
 }
   
+
+
+## function to load and format minilog data
+
+load_minilog=function(main_wd, minilog, dates){
+  
+  xdat <- read_excel(file.path(main_wd, 'data', 'minilog', paste0(paste(minilog, dates, sep='_'), '.xlsx')),
+                     sheet='DAT')
+  names(xdat)=c('date', 'temp', 'depth', 'sal', 'conductivity', 'sound_vel')
+  xdat$date=as.POSIXct(xdat$date*86400, 
+                       format='%d.%m.%Y %H:%M:%S', 
+                       tz="UTC", 
+                       origin = '30.12.1899 00:00:01')
+  xdat$depth=as.numeric(str_replace(xdat$depth, ',', '.'))
+  xdat$temp=as.numeric(str_replace(xdat$temp, ',', '.'))
+  xdat$sal=as.numeric(str_replace(xdat$sal, ',', '.'))
+  xdat$day=as.POSIXct(substr(xdat$date, 1,10), tz='UTC')
+  return(xdat)
   
   
+}
+  
+
 
 
 

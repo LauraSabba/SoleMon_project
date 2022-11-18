@@ -98,7 +98,7 @@ A typical case for subsample of non-target species is MUREBRA. When it occurrs i
 
 ## Minilog
 
-Specify just how to call and where to store the excels files retrieved from seastar. There will be a file that keep track of the minilog deployment. Name of the minilog data file should be like minilogcode_partx
+Excel files retrieved from SeaStar should be stored in the folder 'data/minilog' and called as 'minilogcode_shortdate' (e.g.: K9478_1012').
 
 # Processing data
 
@@ -227,6 +227,10 @@ for(xhaul in 1:nrow(haul_summary)){
 
 ```
 
+
+## process minilog data
+
+TBD
 
 
 ## Input data required by the code
