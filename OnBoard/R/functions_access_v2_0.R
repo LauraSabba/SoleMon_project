@@ -1,6 +1,6 @@
 # Data Handling for Solemon data: from Access to trust format
 #
-# Last update: 14.11.2022
+# Last update: 24.11.2022 added line 57, to be uploaded on main code
 #
 # Notes: this code run on R 4.0.5 32 bit version due to compatibility issue with RODBC package needed to read from .accdb
 
@@ -11,9 +11,9 @@ library(RODBC)
 library(gridExtra)
 library(grid)
 '%ni%'=Negate('%in%')
-main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
-               ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/github/SoleMon_project/OnBoard", 
-                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA)))
+#main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
+#               ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/github/SoleMon_project/OnBoard", 
+#                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA)))
 
 # set parameters ####
 DRIVERINFO <- "Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
@@ -49,11 +49,12 @@ function1=function(haul, db, year){
   channel <- odbcDriverConnect(PATH)
   #acctables=sqlTables(channel) # look for tables
   xdat <- sqlQuery(channel,
-                   paste0("SELECT * FROM [", paste0('cala', haul), "] ORDER BY [ID]"),
+                   paste0("SELECT * FROM [", paste0('cala_', haul), "] ORDER BY [ID]"),
                    stringsAsFactors = FALSE) # Load data into R dataframe
   close(channel)
   rm(channel)
   # format data: empty cells, NAs, paste species #### 
+  write.csv(xdat, paste0('output/raw_excel/',haul,'.csv'),row.names = F) # new line
   xdat=as_tibble(xdat)
   xdat[is.na(xdat$weight_g),'weight_g']=0
   xdat[is.na(xdat$Mat),'Mat']=0
@@ -137,7 +138,7 @@ function1=function(haul, db, year){
   if(year>=2022){
     if(nrow(shells_w)>0){
       
-      shells_raising=shells_w[,c("gear", "species_name",  "kg_subsample", "type_subsample", "kg_haul")]
+      shells_raising=shells_w[!is.na(shells_w$type_subsample),c("gear", "species_name",  "kg_subsample", "type_subsample", "kg_haul")]
       
       shells_w=shells_w%>%
         dplyr::group_by(gear, species_name)%>%
@@ -145,21 +146,24 @@ function1=function(haul, db, year){
       
       shells_raising=left_join(shells_raising, shells_w)
       
-      for(j in 1:nrow(shells_raising)){
-        if(shells_raising[j,]$type_subsample=='species'){
-          # case 1, presi tutti animali da cala e poi fatto subcampione per ottenere il numero: n va calcolato, poi kg_subsample diventa w_g
-          w_tot=shells_raising[j,]$kg_subsample
-          n_tot=shells_raising[j,]$kg_subsample*(shells_raising[j,]$n/shells_raising[j,]$w)
-          
-        }else if(shells_raising[j,]$type_subsample=='haul'){
-          # case 2, fatto subcampione da cala e poi processati tutti individui del subcampione: n_tot va calcolato, w_tot va calcolato
-          w_tot=shells_raising[j,]$w*(shells_raising[j,]$kg_haul/shells_raising[j,]$kg_subsample) 
-          n_tot=w_tot*(shells_raising[j,]$n/shells_raising[j,]$w) # number in subsample
+      if(nrow(shells_raising)>0){
+        for(j in 1:nrow(shells_raising)){
+          if(shells_raising[j,]$type_subsample=='species'){
+            # case 1, presi tutti animali da cala e poi fatto subcampione per ottenere il numero: n va calcolato, poi kg_subsample diventa w_g
+            w_tot=shells_raising[j,]$kg_subsample
+            n_tot=shells_raising[j,]$kg_subsample*(shells_raising[j,]$n/shells_raising[j,]$w)
+            
+          }else if(shells_raising[j,]$type_subsample=='haul'){
+            # case 2, fatto subcampione da cala e poi processati tutti individui del subcampione: n_tot va calcolato, w_tot va calcolato
+            w_tot=shells_raising[j,]$w*(shells_raising[j,]$kg_haul/shells_raising[j,]$kg_subsample) 
+            n_tot=w_tot*(shells_raising[j,]$n/shells_raising[j,]$w) # number in subsample
+          }
+          shells_raising[j,]$w=round(w_tot, digits=2)
+          shells_raising[j,]$n=round(n_tot)
         }
-        shells_raising[j,]$w=round(w_tot, digits=2)
-        shells_raising[j,]$n=round(n_tot)
+        weight_not_target=rbind(weight_not_target, shells_raising%>%dplyr::select(names(weight_not_target)))
+        
       }
-      weight_not_target=rbind(weight_not_target, shells_raising%>%dplyr::select(names(weight_not_target)))
     }
   }else{
     shells_w=shells_w%>%
