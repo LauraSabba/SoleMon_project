@@ -1,3 +1,4 @@
+
 #
 #
 # This script controls the functions needed to preocess solemon data collected onboard.
@@ -24,12 +25,12 @@ unique(target_species$species_name) # these are the species for which you collec
 shells  # these are the species for which you collect total weight and total number 
 unique(haul_order$haul)
 # set parameters
-haul=13 # single haul OR 'all'
-db='2022_1' # to be specified only for single hauls
+haul='1MS' # single haul OR 'all'
+db='2022_ms' # to be specified only for single hauls
 updateID='N'
 area_sepia='D'
 year=2022
-area='ITA_17' 
+area='MSFD' 
 
 
 
@@ -42,6 +43,7 @@ hauldata=function1(haul=haul,
 # function 2: perform checks
 function2(xdat=hauldata, 
           haul=haul)
+
 
 # function 3: format data to trust format
 trustdat=function3(xdat=hauldata[[1]], 
@@ -60,12 +62,110 @@ function4(trustdat = trustdat,
 # multi-haul applications: need extra file ####
 haul_summary=read_excel("data/haul_order.xlsx")
 haul_summary=haul_summary[haul_summary$valid>=0,]
-haul_summary$DB='2022_1'
+#haul_summary$DB='2022_1'
 
 
-# get oto LFD
+## get oto LFD ####
 oto_store=NULL
+meli_store=NULL
+oto_hist=read.csv('output/otolith_LFD.csv')
+#oto_summary=haul_summary[as.character(haul_summary$day)%in%c('2022-12-03'),]
+oto_summary=haul_summary
+xhaul=1
 
+for(xhaul in 1:nrow(oto_summary)){
+  
+  
+  # loop parameters
+  haul=oto_summary[xhaul,]$haul
+  db=oto_summary[xhaul,]$DB
+  area=oto_summary[xhaul,]$country
+  
+  cat('processing haul no.', haul, '(', xhaul,'/', nrow(oto_summary),')' )
+  
+  # function1 extract data from access db and format them
+  hauldata=function1(haul=haul, 
+                     db=db,
+                     year=year)# extract and format data
+  
+  
+  LFD=hauldata[[1]]
+  
+  soleLFD=LFD[LFD$species_name=='SOLEVUL' &
+                    !is.na(LFD$fish_ID),]
+  
+  names(soleLFD)
+  soleLFD=soleLFD[,c("gear", "species_name","lenght_mm" , "weight_g","Sex" ,"Mat")]
+  soleLFD$haul=haul
+  meliLFD=LFD[LFD$species_name=='MELIKER' &
+                !is.na(LFD$fish_ID),]
+  
+  oto_store=rbind(oto_store, soleLFD)
+  meli_store=rbind(meli_store, meliLFD)
+  
+}
+
+oto_store=oto_store%>%
+  dplyr::mutate(len_bin=floor(lenght_mm/10))%>%
+  dplyr::group_by(len_bin)%>%
+  tally()
+
+oto_store=rbind(oto_hist, oto_store)
+#write.csv(oto_store, 'output/otolith_LFD.csv', row.names = F)
+pLFD=ggplot(data=oto_store)+
+  geom_col(aes(x=len_bin, y=n))+
+  scale_x_continuous(breaks = seq(min(oto_store$len_bin), max(oto_store$len_bin),1))+
+  scale_y_continuous(breaks = seq(1,20,1))+
+  geom_hline(yintercept = 10, color='red')+
+  geom_hline(yintercept = 15, color='green');pLFD
+ggsave(plot=pLFD, 'output/soleLFD.png', height = 10, width = 12, units='cm')
+
+
+meli_store=meli_store%>%
+  dplyr::mutate(len_bin=floor(lenght_mm))%>%
+  dplyr::group_by(len_bin)%>%
+  tally()
+
+## get sepia ID ####
+sepi_store=NULL
+oto_summary=haul_summary
+
+xhaul=1
+
+for(xhaul in 1:nrow(oto_summary)){
+  
+  
+  # loop parameters
+  haul=oto_summary[xhaul,]$haul
+  db=oto_summary[xhaul,]$DB
+  area=oto_summary[xhaul,]$country
+  
+  cat('processing haul no.', haul, '(', xhaul,'/', nrow(oto_summary),')' )
+  
+  # function1 extract data from access db and format them
+  hauldata=function1(haul=haul, 
+                     db=db,
+                     year=year)# extract and format data
+  
+  
+  LFD=hauldata[[1]]
+  
+  sepidat=LFD[LFD$species_name=='SEPIOFF' &
+                !is.na(LFD$fish_ID),]
+  sepidat$haul=haul
+  
+  sepi_store=rbind(sepi_store, sepidat)
+  print(paste(nrow(sepidat), 'sepia found in haul', haul))
+ 
+  
+}
+
+write.csv(sepi_store, 'output/sepiasample.csv', row.names = F)
+
+
+
+## check subsamples ####
+xdat_store=NULL
 for(xhaul in 1:nrow(haul_summary)){
   
   
@@ -82,27 +182,15 @@ for(xhaul in 1:nrow(haul_summary)){
                      year=year)# extract and format data
   
   
-  soleLFD=hauldata[[1]]
-  soleLFD=soleLFD[soleLFD$species_name=='SOLEVUL' &
-                    !is.na(soleLFD$fish_ID),]
-  
-  oto_store=rbind(oto_store, soleLFD)
+  xdat=hauldata[[2]]
+  xdat=xdat[xdat$species_name%in%shells,]
+  xdat$haul=haul
+  xdat_store=rbind(xdat_store, xdat)
+ 
   
 }
 
-oto_store=oto_store%>%
-  dplyr::mutate(len_bin=floor(lenght_mm/10))%>%
-  dplyr::group_by(len_bin)%>%
-  tally()
-
-write.csv(oto_store, 'output/otolith_LFD.csv', row.names = F)
-pLFD=ggplot(data=oto_store)+
-  geom_col(aes(x=len_bin, y=n))+
-  scale_x_continuous(breaks = seq(min(oto_store$len_bin), max(oto_store$len_bin),1))+
-  scale_y_continuous(breaks = seq(1,20,1))+
-  geom_hline(yintercept = 10, color='red');pLFD
-ggsave(plot=pLFD, 'output/soleLFD.png', height = 10, width = 12, units='cm')
-
+## full workflow entire dataset ####
 
 for(xhaul in 1:nrow(haul_summary)){
   

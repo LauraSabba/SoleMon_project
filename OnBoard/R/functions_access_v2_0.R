@@ -5,11 +5,13 @@
 # Notes: this code run on R 4.0.5 32 bit version due to compatibility issue with RODBC package needed to read from .accdb
 
 # load libraries ####
+options(tidyverse.quiet = TRUE)
 library(tidyverse)
 library(readxl)
 library(RODBC)
 library(gridExtra)
 library(grid)
+options(dplyr.summarise.inform = FALSE)
 '%ni%'=Negate('%in%')
 #main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
 #               ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/github/SoleMon_project/OnBoard", 
@@ -43,6 +45,8 @@ species_list=left_join(species_list, target_species,by='species_name')%>%
 # extract and format data 
 function1=function(haul, db, year){
  
+  print(paste('Processing haul', haul))
+  
   # connect to access db ####
   MDBPATH <- paste0(wd_acces,"/Maschera inserimento SOLEMON_",db,".accdb")
   PATH <- paste0(DRIVERINFO, "DBQ=", MDBPATH)
@@ -55,6 +59,15 @@ function1=function(haul, db, year){
   rm(channel)
   # format data: empty cells, NAs, paste species #### 
   write.csv(xdat, paste0('output/raw_excel/',haul,'.csv'),row.names = F) # new line
+  
+  xdat$idfk=seq(1:nrow(xdat))
+  deleterow=xdat[xdat$lenght_mm %in% c(NA, 0) & 
+       xdat$weight_g %in% c(NA, 0) &
+       xdat$total_number %in% c(NA, 0),]$idfk
+  
+  xdat=xdat[xdat$idfk%ni%deleterow,]
+  print(paste('no records =', nrow(xdat), ', deleted', length(deleterow), 'rows'))
+  
   xdat=as_tibble(xdat)
   xdat[is.na(xdat$weight_g),'weight_g']=0
   xdat[is.na(xdat$Mat),'Mat']=0
@@ -114,6 +127,7 @@ function1=function(haul, db, year){
   xdat$Mat=ifelse(xdat$species_name%in% c('MELIKER', 'PAPELON') &
                     xdat$Sex=='F' &
                     xdat$Mat==0, 1, xdat$Mat) 
+  print(paste('Maturity 0 assigned to',unique(xdat[xdat$target & xdat$Mat%ni%c(1,2,3,4,5,6),]$species_name)))
   xdat[xdat$Mat%ni%c(1,2,3,4,5,6),]$Mat=NA
   xdat$Mat=as.character(xdat$Mat)
   
@@ -140,11 +154,22 @@ function1=function(haul, db, year){
       
       shells_raising=shells_w[!is.na(shells_w$type_subsample),c("gear", "species_name",  "kg_subsample", "type_subsample", "kg_haul")]
       
+      if(nrow(shells_w)>0){print(shells_raising)}
+      
+      shells_raising$kg_subsample=ifelse(nchar(shells_raising$kg_subsample)<=3, 
+             shells_raising$kg_subsample ,
+             shells_raising$kg_subsample/1000)
+      
+      shells_raising$kg_haul=ifelse(nchar(shells_raising$kg_haul)<=3, 
+             shells_raising$kg_haul ,
+             shells_raising$kg_haul/1000)
+      
       shells_w=shells_w%>%
         dplyr::group_by(gear, species_name)%>%
         dplyr::summarise(w=sum(weight_g)/1000, n=sum(total_number))
       
-      shells_raising=left_join(shells_raising, shells_w)
+      shells_raising=left_join(shells_raising, shells_w, 
+                               by = c("gear", "species_name"))
       
       if(nrow(shells_raising)>0){
         for(j in 1:nrow(shells_raising)){
@@ -172,21 +197,43 @@ function1=function(haul, db, year){
     weight_not_target=rbind(weight_not_target, shells_w)
   }
   
-  
   xdat[xdat$target!=1,]$weight_g=-1
   # remove shells
   xdat=xdat[xdat$species_name%ni% shells, ]
   
   # weight data for sub-samples of target species (AEQUOPE, mullets etc..) ####
-  subsamples_target=xdat[xdat$total_number >0,]
+  subsamples_target=xdat[xdat$total_number >0|!is.na(xdat$type_subsample),]
   
   if(nrow(subsamples_target)>0){
+    
+    for(k in 1:nrow(subsamples_target)){
+      if(subsamples_target[k,]$total_number %in% c(NA,0)){
+        if(subsamples_target[k,]$type_subsample=='species'){
+          
+          # reconstruct number
+          print(paste('subsample done for', subsamples_target[k,]$species_name))
+          measured_animals=xdat[xdat$species_name==subsamples_target[k,]$species_name &
+                 is.na(xdat$type_subsample),]
+          meas_w=sum(measured_animals$weight_g)
+          meas_n=nrow(measured_animals)
+          subsamples_target[k,]$total_number=round((subsamples_target[k,]$weight_g*meas_n)/meas_w)
+          
+        }else if(shells_raising[j,]$type_subsample=='haul'){
+          
+          print('targetspecies subsample type haul: case not yet considered')
+          
+        }
+         
+      }
+    }
+    
     subsamples_target=subsamples_target%>%
       dplyr::group_by(gear, species_name)%>%
       dplyr::summarise(w=sum(weight_g)/1000, n=sum(total_number))
   }
+  
   # remove subsamples
-  xdat=xdat[xdat$total_number ==0,]
+  xdat=xdat[xdat$total_number ==0 & is.na(xdat$type_subsample),]
   
   # Fill gaps for target: lw ####
   for(i in 1:nrow(xdat)){
