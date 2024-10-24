@@ -76,8 +76,7 @@ detail:
 - **Notes**: accept notes of any kind.
 
 <figure>
-<img
-src="C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/header_acces.png"
+<img src="OnBoard/data/other/header_acces.png"
 alt="Figure 2: Example of the structure of the access file" />
 <figcaption aria-hidden="true">Figure 2: Example of the structure of the
 access file</figcaption>

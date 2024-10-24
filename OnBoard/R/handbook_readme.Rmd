@@ -52,7 +52,7 @@ The structure of the sheets, in 2024, is according to Figure1. In detail:\
 -   **type_subsample**: accepts values "haul", "species", "multi", "other". The compilation depends on the case.
 -   **Notes**: accept notes of any kind.
 
-![Figure 2: Example of the structure of the access file](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/header_acces.png)
+![Figure 2: Example of the structure of the access file](OnBoard/data/other/header_acces.png)
 
 ### .accdb auto compilation general details
 
