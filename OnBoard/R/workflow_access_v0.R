@@ -13,10 +13,11 @@
 #
 #
 rm(list = ls())
-main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
-               ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/github/SoleMon_project/OnBoard", 
-                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA))) 
-#main_wd="C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/AtSeaData/2022"
+#main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
+#               ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/github/SoleMon_project#/OnBoard", 
+#                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA))) 
+
+main_wd="C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/AtSeaData/2023"
 setwd(main_wd)
 source('R/functions_access_v2_0.R')
 
@@ -25,12 +26,12 @@ unique(target_species$species_name) # these are the species for which you collec
 shells  # these are the species for which you collect total weight and total number 
 unique(haul_order$haul)
 # set parameters
-haul='1MS' # single haul OR 'all'
-db='2022_ms' # to be specified only for single hauls
+haul='56' # single haul OR 'all'
+db='2023_part1_complete' # to be specified only for single hauls
 updateID='N'
 area_sepia='D'
-year=2022
-area='MSFD' 
+year=2023
+area='ITA17' 
 
 
 
@@ -60,6 +61,7 @@ function4(trustdat = trustdat,
           haul=haul)
 
 # multi-haul applications: need extra file ####
+
 haul_summary=read_excel("data/haul_order.xlsx")
 haul_summary=haul_summary[haul_summary$valid>=0,]
 #haul_summary$DB='2022_1'
@@ -191,6 +193,15 @@ for(xhaul in 1:nrow(haul_summary)){
 }
 
 ## full workflow entire dataset ####
+updateID='N'
+year=2023
+activate_funs=data.frame(xfunction=c(1:4),
+                         activate=c(1,1,1,0))
+
+haul_summary=read_excel("data/haul_order.xlsx")
+#haul_summary[haul_summary$haul=='44',]$valid=-1
+haul_summary=haul_summary[haul_summary$valid>=0,]
+
 
 for(xhaul in 1:nrow(haul_summary)){
   
@@ -212,24 +223,33 @@ for(xhaul in 1:nrow(haul_summary)){
   soleLFD=soleLFD[soleLFD$species_name=='SOLEVUL' &
             !is.na(soleLFD$fish_ID),]
   
-  
-  # function 2: perform checks
-  function2(xdat=hauldata, 
-            haul=haul)
-  
-  # function 3: format data to trust format
-  trustdat=function3(xdat=hauldata[[1]], 
-                     haul=haul, 
-                     year = year, 
-                     weight_not_target = hauldata[[2]],  
-                     subsamples_target=hauldata[[3]],
-                     catch_sample_disattivati = catch_sample_disattivati) # function 2
-  
-  # function4: save PDF
-  function4(trustdat = trustdat, 
-            year=year,
-            area=area,
-            haul=haul)
+  if(activate_funs[2,]$activate==1){
+    # function 2: perform checks
+    function2(xdat=hauldata, 
+              haul=haul)
+    
+  }
 
-
+  
+  if(activate_funs[3,]$activate==1){
+    # function 3: format data to trust format
+    trustdat=function3(xdat=hauldata[[1]], 
+                       haul=haul, 
+                       year = year, 
+                       weight_not_target = hauldata[[2]],  
+                       subsamples_target=hauldata[[3]],
+                       catch_sample_disattivati = catch_sample_disattivati)
+    
+  }
+  
+  if(activate_funs[4,]$activate==1){
+    # function4: save PDF
+    function4(trustdat = trustdat, 
+              year=year,
+              area=area,
+              haul=haul)
+    
+  }
 }
+
+
