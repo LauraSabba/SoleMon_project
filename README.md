@@ -33,6 +33,9 @@ The explanation of the procedure used to collect data is detailed in the
 The procedure reported here is also explained in more detail in the
 [handbook](https://cnrfisheries.github.io/SoleMon_project/).
 
+*Carefully check the version history section to make sure to use the
+proper files in 2024*
+
 1.  To collect the data, please use the access files in the “access”
     subfolder. Follow the handbook for the terminology to be used when
     starting a new access and a new haul
@@ -45,3 +48,16 @@ The procedure reported here is also explained in more detail in the
     file you need to open is “workflow_access_v0.R”. **IMPORTANT**: when
     you use the script for the first time, make sure to add your working
     directory
+
+## Version history
+
+The access file and R code were modified over the years. In 2024, the
+reference versions are:
+
+- access file for data collection: bio_data_v2024_SOLEMON_template
+
+- R workflow: workflow_access_v2024
+
+- R supplementary functions: functions_access_v2024.R
+
+A detailed history of past versions is coming
