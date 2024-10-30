@@ -164,14 +164,13 @@ function1=function(haul, db, year){
     }
   }
  
-  
-  #############################################
-  ################ Modified_AP ###################### 
-  ### fill gaps non target species L-W relationship if freq=1 (means single individuals data) ####
+  # Fill gaps non target species L-W relationship ####
+  ### new section (oct 2024): fill gaps non target species L-W relationship if freq=1 (means single individuals data)
   
   if(nrow(xdat)>0){
-    xdat<-xdat%>% group_by(gear, species_name) %>%
-      mutate(Freq = n())
+    xdat<-xdat%>% 
+      dplyr::group_by(gear, species_name) %>%
+      dplyr::mutate(Freq = n())
 
     for(i in 1:nrow(xdat_a)){
       # format length weight data
@@ -203,8 +202,7 @@ function1=function(haul, db, year){
             }
           }
   xdat<-subset(xdat, select=-Freq)
-  #############################################
-  ################ end change to be checked ######################
+  # end new section ####
   
   # weight data for non target & raising shells ####
   shells_w=xdat[xdat$species_name%in% shells,]
@@ -256,7 +254,6 @@ function1=function(haul, db, year){
             w_tot=shells_raising[j,]$w*(shells_raising[j,]$kg_haul/shells_raising[j,]$kg_subsample) 
             n_tot=w_tot*(shells_raising[j,]$n/shells_raising[j,]$w) # number in subsample
           }else if(shells_raising[j,]$type_subsample=='multispecies'){
-            ### Modified_AP ###
             # case 3 multispecies: ALL individuals of multiple species collected from the haul, subsample of multiple species together, splitting of the species, subsample only for estimating total number (proportion done onboard, so we have the total number of the subsample
             w_tot=shells_raising[j,]$kg_haul*(shells_raising[j,]$w/shells_raising[j,]$kg_subsample) 
             n_tot=w_tot*(shells_raising[j,]$n/shells_raising[j,]$w)

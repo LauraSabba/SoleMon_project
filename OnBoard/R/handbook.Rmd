@@ -110,7 +110,7 @@ In terms of onboard procedure, the cases general refers to:
 -   Case 2: an unsorted subsample is taken from the haul, then it is sorted and ALL the individuals from the sorted subsample are processed
 -   Case 3: it applies for those shellfish coming in huge quantity (MUREBRA, HEXATRU). The subsampling happens in multiple steps (refer to dedicated section)
 
-![Figure 7: type of subsamples](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/subsample_general.png){width="900" height="500" style="display: block; margin: 0 auto"}
+![Figure 7: type of subsamples](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/subsample_general.png){width="900" height="700" style="display: block; margin: 0 auto"}
 
 ### Target species
 

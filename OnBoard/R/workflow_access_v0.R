@@ -13,24 +13,24 @@
 #
 #
 rm(list = ls())
-#main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
-#               ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/github/SoleMon_project#/OnBoard", 
-#                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA))) 
+main_wd=ifelse(Sys.info()[['user']]=="solemon_pc", 'C:/Users/solemon_pc/Desktop/solemon/2022/raccolta_dati',
+               ifelse(Sys.info()[['user']]=="e.armelloni", "C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard", 
+                      ifelse(Sys.info()[['user']]=="Franc", "C:/Users/Franc/OneDrive/Desktop/solemon/2022/raccolta_dati", NA))) 
 
-main_wd="C:/Users/e.armelloni/OneDrive/Lavoro/Solemon/AtSeaData/2023"
+#main_wd="C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/AtSeaData/2023"
 setwd(main_wd)
-source('R/functions_access_v2_0.R')
+source('R/functions_access_v2024.R')
 
 # inspect lists of target species and shells
 unique(target_species$species_name) # these are the species for which you collect individual length AND individual weight
 shells  # these are the species for which you collect total weight and total number 
 unique(haul_order$haul)
 # set parameters
-haul='56' # single haul OR 'all'
-db='2023_part1_complete' # to be specified only for single hauls
+haul='test' # single haul OR 'all'
+db='test' # to be specified only for single hauls
 updateID='N'
 area_sepia='D'
-year=2023
+year=2024
 area='ITA17' 
 
 
