@@ -362,7 +362,7 @@ function1=function(haul, db, year){
 } 
 
 # performs checks 
-function2=function(xdat, haul, year=year){
+function2=function(xdat, haul, year=2024){
   
   xxdat=xdat[[1]]
   # lw plot target species with the L-W theorethical function########### ### Modified_AP ###
