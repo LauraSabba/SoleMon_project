@@ -15,13 +15,15 @@ library(kableExtra)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
 # Access file creation and structure
 
 ## Starting a new access file
 
 Data collected onboard are stored in access files, located in the "OnBoard/access" subfolder. Ideally, a maximum of 20 hauls should be stored in a .accdb file.
+**IMPORTANT: in case the data collection is done in parallel over multiple laptops, the "OnBoard" folder must be renamed with unique identifiers (e.g.: OnBoard_2024_PLE). Instructions to set up a folder on a new laptop are reported in the repository main page**
 
-To start a new file, copy the template version "bio_data_v2024_SOLEMON_template.accdb", paste it in the same folder and rename it as "bio_data_v2024_SOLEMON_YEAR_N.accdb", where YEAR is the reporting year and N is a progressive number. Example: "**bio_data_v2024_SOLEMON_2024_1.accdb**" . *It does not matter if parts of the same haul are in different files, this is handled in post-processing*.
+To start a new file, copy the template version, which in 2024 it is called "bio_data_v2024_SOLEMON_template.accdb", paste it in the same "OnBoard/access" (or OnBoard_2024_PLE/access) subfolder and rename it as "bio_data_v2024_SOLEMON_YEAR_N.accdb", where YEAR is the reporting year and N is a progressive number. Example: "**bio_data_v2024_SOLEMON_2024_1.accdb**" . *It does not matter if parts of the same haul are in different files, this is handled in post-processing. It does not matters if access with the same name are located in different laptops, this is handled in post processing*.
 
 ## Starting a new haul
 
@@ -99,9 +101,10 @@ Subsamples are taken when the amount of individuals in a given species is too hi
 
 In terms of onboard procedure, the cases general refers to:
 
--   Case 1: ALL the individuals from a haul are collected (sorted sample), then the sorted sample is subsampled and processed
--   Case 2: an unsorted subsample is taken from the haul, then it is sorted and ALL the individuals from the sorted subsample are processed
--   Case 3: it applies for those shellfish coming in huge quantity (MUREBRA, HEXATRU). The subsampling happens in multiple steps (refer to dedicated section)
+-   Case 1 (C1): ALL the individuals from a haul are collected (sorted sample), then the sorted sample is subsampled and processed
+-   Case 2 (C2): an unsorted subsample is taken from the haul, then it is sorted and ALL the individuals from the sorted subsample are processed
+-   Case 3 (C3): a partially sorted subsample (e.g.: the subsample is taken after commercial species are sorted out, same procedure used for the discard subsample) is taken from the haul, then it is sorted and ALL the individuals from the sorted subsample are processed
+-   Case 4 (C4): it applies for those shellfish coming in huge quantity (MUREBRA, HEXATRU). The subsampling happens in multiple steps (refer to dedicated section)
 
 ![Figure 7: type of subsamples](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/subsample_general.png){width="900" height="900" style="display: block; margin: 0 auto"}
 
@@ -109,19 +112,27 @@ In terms of onboard procedure, the cases general refers to:
 
 A typical case for subsample of target species is AEQUOPE, which usually occurs in large quantities and LFD is needed. In this case only a few individuals are measured to obtain the length structure, then it is needed to estimate total number (and sometimes total weight). Individuals that are processed for length and weight can be treated as any other target species. Regarding the other information needed to raise the values, you need to create a new record for the species (and gear) to store subsample data. There are two expected cases:
 
-#### **case 1 - Target**
+#### **Case 1 (C1_species) - Target species**
 
-ALL individuals collected from the haul (sorted sample), then a subsample is taken (sorted subsample) for individual processing. One record is dedicated to the subsample details. The total weight of the sorted sample (in kilograms) is reported in the in the *kg_field1* field. The weight of the sorted subsample is reported in the *kg_field2*. *type_subsample* is "species". The individuals subsampled are processed according to the standard procedure for target species, creating a new record for each specimen.
+ALL individuals collected from the haul (sorted sample), then a subsample is taken (sorted subsample) for individual processing. One record is dedicated to the subsample details. The total weight of the sorted sample (in kilograms) is reported in the in the *kg_field1* field. The weight of the sorted subsample is reported in the *kg_field2*. *type_subsample* is "C1_species". The individuals subsampled are processed according to the standard procedure for target species, creating a new record for each specimen.
 
-![Figure 8: subsamples, case 1 for target species species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/target_sub1.png){width="900" height="400" style="display: block; margin: 0 auto"}
+![Figure 8: subsamples, case 1 for target species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/target_sub1.png){width="900" height="400" style="display: block; margin: 0 auto"}
 
 <br> <br>
 
-#### **case 2 - Target**
+#### **Case 2 (C2_haul) - Target species**
 
-A subsample is taken from the haul (unsorted subsample), then ALL the individuals in the subsample are collected (sorted subsample) for individual processing. One record is dedicated to the subsample details. The weight of the haul is reported in *kg_field1*. The weigth of the unsorted subsample is reported in *kg_field2*. The weight of the sorted subsample is reported in *kg_field3*. *type_subsample* is "haul". The individuals subsampled are processed according to the standard procedure for target species, creating a new record for each specimen.
+A subsample is taken from the haul as soon as it is taken (unsorted subsample, before removing anything from the haul), then ALL the individuals in the subsample are collected (sorted subsample) for individual processing. One record is dedicated to the subsample details. The weight of the haul is reported in *haul_weight*. The weigth of the unsorted subsample is reported in *kg_field1*. The weight of the sorted subsample is reported in *kg_field2*. *type_subsample* is "C2_haul". The individuals subsampled are processed according to the standard procedure for target species, creating a new record for each specimen.
 
-![Figure 9: subsamples, case 2 for target species species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/target_sub2.png){width="900" height="400" style="display: block; margin: 0 auto"}
+![Figure 9: subsamples, case 2 for target species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/target_sub2.png){width="900" height="400" style="display: block; margin: 0 auto"}
+
+<br> <br>
+
+#### **Case 3 (C3_benthos) - Target species**
+
+A subsample is taken from the haul after partial sorting (partially sorted subsample). This procedure is tipically applied to benthos subsample, which is taken after commercial species and litter are removed. Therefore, subsamples taken with this procedure need to be raised using the standard procedure to raise discard data. Then, ALL the individuals in the subsample are collected (sorted subsample) for individual processing. One record is dedicated to the subsample details. The weight of the haul is reported in *haul_weight*. The weigth of the unsorted subsample is reported in *kg_field1*. The weight of the sorted subsample is reported in *kg_field2*. *type_subsample* is "C3_benthos". The individuals subsampled are processed according to the standard procedure for target species, creating a new record for each specimen.
+
+![Figure 10: subsamples, case 3 for target species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/target_sub3.png){width="900" height="400" style="display: block; margin: 0 auto"}
 
 <br> <br>
 
@@ -131,37 +142,45 @@ A typical case for subsample of non-target species is MUREBRA. When it occurrs i
 
 <br>
 
-#### **Case 1 - Non target**
+#### **Case 1 (C1_species) - Non target**
 
-ALL individuals collected from the haul (sorted sample), then a subsample is taken (sorted subsample) for estimating total number. One record is dedicated to the subsample details. The total weight of the sorted sample (in kilograms) is reported in the in the *kg_field1* field. The weight of the sorted subsample is reported in the *kg_field2*. The number of individual in the sorted subsample is reported in the *number_field1*. *type_subsample* is "species".
+ALL individuals collected from the haul (sorted sample), then a subsample is taken (sorted subsample) for estimating total number. One record is dedicated to the subsample details. The total weight of the sorted sample (in kilograms) is reported in the in the *kg_field1* field. The weight of the sorted subsample is reported in the *kg_field2*. The number of individual in the sorted subsample is reported in the *subsample_number*. *type_subsample* is "C1_species".
 
-![Figure 10: subsamples, case 1 for non target species species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/nontarget_sub1.png){width="900" height="400" style="display: block; margin: 0 auto"}
-
-<br> <br>
-
-#### **Case 2 - Non target**
-
-A subsample is taken from the haul (unsorted subsample), then ALL the individuals in the subsample are collected (sorted subsample) for estimating total number. One record is dedicated to the subsample details. The weight of the haul is reported in *kg_field1*. The weigth of the unsorted subsample is reported in *kg_field2*. The weight of the sorted subsample is reported in *kg_field3*. The number of individual in the sorted subsample is reported in the *number_field1*. *type_subsample* is "haul".
-
-![Figure 11: subsamples, case 2 for non target species species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/nontarget_sub2.png){width="900" height="400" style="display: block; margin: 0 auto"}
+![Figure 11: subsamples, case 1 for non target species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/nontarget_sub1.png){width="900" height="400" style="display: block; margin: 0 auto"}
 
 <br> <br>
 
-#### **Case 3 - Non target**
+#### **Case 2 (C2_haul) - Non target**
 
-it has been only used for MUREBRA and HEXATRU in cases of exceptional catches. ALL individuals of these two species are collected from the haul (partially sorted sample), then a subsample is taken from the partially sorted sample (partially sorted subsample). The partially sorted subsample is sorted, aka it is divede into species (sorted subsample). The sorted subsample of each species is subsampled againg (sorted sub subsample) for estimating total number. One record is dedicated to the subsample details. The weight of the partially sorted sample is reported in *kg_field1*. The weigth of the sorted subsample for each species is reported in *kg_field2*. The weight of the sorted sub-subsample is reported in *kg_field3*. The number of individual in the sorted sub-subsample is reported in the *number_field1*. *type_subsample* is "multi".
+A subsample is taken from the haul as soon as it is taken (unsorted subsample, before removing anything from the haul), then ALL the individuals in the subsample are collected (sorted subsample) for estimating total number. One record is dedicated to the subsample details. The weight of the haul is reported in *haul_weight*. The weigth of the unsorted subsample is reported in *kg_field1*. The weight of the sorted subsample is reported in *kg_field2*. The number of individual in the sorted subsample is reported in the *subsample_number*. *type_subsample* is "C2_haul".
 
-![Figure 12: subsamples, case 3 for non target species species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/nontarget_sub3.png){width="900" height="400" style="display: block; margin: 0 auto"}
+![Figure 12: subsamples, case 2 for non target species](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/nontarget_sub2.png){width="900" height="400" style="display: block; margin: 0 auto"}
+
+<br> <br>
+
+#### **Case 3 (C3_benthos) - Non target**
+
+A subsample is taken from the haul after partial sorting (partially sorted subsample). This procedure is tipically applied to benthos subsample, which is taken after commercial species and litter are removed. Therefore, subsamples taken with this procedure need to be raised using the standard procedure to raise discard data. Then, ALL the individuals in the subsample are collected (sorted subsample) for individual processing. One record is dedicated to the subsample details. The weight of the haul is reported in *haul_weight*. The weigth of the unsorted subsample is reported in *kg_field1*. The weight of the sorted subsample is reported in *kg_field2*. The number of individual in the sorted subsample is reported in the *subsample_number*. *type_subsample* is "C3_benthos".
+
+![Figure 13: subsamples, case 3 for non target](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/nontarget_sub_benthos.png){width="900" height="400" style="display: block; margin: 0 auto"}
+
+<br> <br>
+
+#### **Case 4 (C4_multiple) - Non target**
+
+it has been only used for MUREBRA and HEXATRU in cases of exceptional catches. ALL individuals of these two species are collected from the haul (partially sorted sample), then a subsample is taken from the partially sorted sample (partially sorted subsample). The partially sorted subsample is sorted, aka it is divede into species (sorted subsample). The sorted subsample of each species is subsampled againg (sorted sub subsample) for estimating total number. One record is dedicated to the subsample details. The weight of the partially sorted sample is reported in *kg_field1*. The weigth of the sorted subsample for each species is reported in *kg_field2*. The weight of the sorted sub-subsample is reported in *kg_field3*. The number of individual in the sorted sub-subsample is reported in the *subsample_number*. *type_subsample* is "multi".
+
+![Figure 14: subsamples, case 4 for non target](C:/Users/e.armelloni/OneDrive/Lezioni/Lavoro/Solemon/github/SoleMon_project/OnBoard/data/other/nontarget_sub_mult.png){width="900" height="400" style="display: block; margin: 0 auto"}
 
 <br> <br>
 
 # Processing data
 
-Data are processed in R. The code runs on R 4.0.5 32 bit version due to compatibility issue with RODBC package needed to read from .accdb. It is good practice to process the data relatively frequently in order to create backup files and to produce some checks that can be used to adjust data.
+Data are processed in R. It is good practice to process the data relatively frequently in order to create backup files and to produce some checks that can be used to adjust data.
 
 ## process haul data
 
-Data stored in the .accdb file are retrieved and handled by R scripts, located in the "R" folder. The required script is `workflow_access_v0`.
+Data stored in the .accdb file are retrieved and handled by R scripts, located in the "R" folder. The required script is `workflow_access_v2024.R`.
 
 ### process single hauls
 
@@ -278,7 +297,6 @@ for(xhaul in 1:nrow(haul_summary)){
 }
 ```
 
-
 # Data files associated to the folder
 
 ### target_species
@@ -303,7 +321,6 @@ names(xdat)[2]='Species_code'
 xdat%>%kbl(caption = "List of target species. Target = 1 are proper target; Target = 2 are shellfishes on which to collect number and weight")%>%kable_styling()
 
 ```
-
 
 ### catch_sample_disattivati
 
@@ -436,4 +453,3 @@ xdat[1:3,]%>%kbl(caption = "Example of the species_list file structure")%>%kable
 
 \
 \
-
